@@ -1,11 +1,15 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import EntornoHome from './Template/Entornos/EntornoHome';
+import EntornoHome from './Template/Entornos/TemplateHome';
+import { BrowserRouter, Route } from "react-router-dom";
+import AppRoutes from './Routes/AppRoutes';
 
 function App() {
   return (
-      <EntornoHome/>
+      <BrowserRouter>
+        <AppRoutes/>
+      </BrowserRouter>
   );
 }
 
