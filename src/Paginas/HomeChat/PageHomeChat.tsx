@@ -3,15 +3,24 @@ import { Grid, Box, Typography, Stack, Paper, Avatar, Icon, IconButton, FormCont
 import { styled } from '@mui/material/styles';
 import { green } from "@mui/material/colors";
 import { flexColumn, flexRow } from "../../Template/Styles/estilosGeneral";
-import { IChatItem,IMensajes,chats,mensajes } from "./helps";
+import {mensajes } from "./helps";
 import AvisoSnackbar from "../../Template/Components/AvisoSnackbar";
 import MiniMenu from "../../Template/Components/MiniMenu";
+import { IChatItem,IMensajes } from "../../Interfaces/generales";
+import { HomeManager } from "../../Utilities/Rxjs/homeManager";
+const homeManager=new HomeManager()
 export default function PageHomeChat() {
     const [loading, setloading] = useState(false)
     const [chat,setChat]=useState<IChatItem>()
     const [openAviso,setopenAviso]=useState<boolean>(false)
-    const [chatsItem,setChatsItem]=useState<IChatItem[]>(chats)
+    const [chatsItem,setChatsItem]=useState<IChatItem[]>([])
     const chatSelectId=useRef<IChatItem>()
+    useEffect(() => {
+        homeManager.getChats(7).subscribe(r=>{
+            setChatsItem(r)
+        })
+       return ()=>console.log("hola")
+    }, []);
     const avisoEliminarChat=(item:IChatItem)=>{
         chatSelectId.current=item
         setopenAviso(true)
@@ -34,7 +43,6 @@ export default function PageHomeChat() {
         setChat(chatSelect)
         setChatsItem(lista)
     }
-    
     return (
         <>
         
@@ -46,7 +54,7 @@ export default function PageHomeChat() {
                         sx={{ width: 70, height: 70, }}
                     />
                     <Typography variant="subtitle1">Jesus Antonio</Typography>
-                    <Stack direction="row" spacing={2} flexWrap="wrap">
+                    <Stack direction="row" spacing={2} sx={{width:"100%",justifyContent:"center",alignItems:"center"}}>
 
                         <Item sx={{...flexColumn}}>
                         <MiniMenu iconnombre="travel_explore">
@@ -119,9 +127,9 @@ const MensajesChat=({chatitem,eliminarChat,setMensajes}:{chatitem:IChatItem,elim
         
         <Grid container spacing={1} height={"100%"} width={"100%"}>
         <Grid item xs={8} style={{position:"relative"}} >
-        <Box sx={{ position:"absolute",display:"flex",justifyContent:"center",alignItems:"center",width:"100%",height:"100%" }}>
-      <CircularProgress />
-    </Box>
+                <Box sx={{ position: "absolute", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+                    <CircularProgress />
+                </Box>
             <Grid container spacing={1} height={"100%"} width={"100%"}>
                 <Grid item xs={12}  sx={{...flexColumn,height:"90%",padding:2}}>
                     <Stack direction="column"  flexWrap="wrap" sx={{width:"98%",height:"95%",flexDirection:"column-reverse"}}>

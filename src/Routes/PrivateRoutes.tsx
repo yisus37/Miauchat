@@ -5,7 +5,7 @@ import PageHomeChat from "../Paginas/HomeChat/PageHomeChat";
 export default function PrivateRoutes(){
     return(
         <Routes>
-            <Route path="/*" element={<RutasPrincipales/>} />
+            <Route path="*" element={<RutasPrincipales/>} />
         </Routes>
     )
 }
