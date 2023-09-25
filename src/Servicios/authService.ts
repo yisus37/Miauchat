@@ -20,7 +20,5 @@ class AuthService{
 }
 export default AuthService
 const users:IUser[]=[
-    {id:7,nombre:"jesus a",username:"yisus37",rolClave:"adm",chats:[
-        { id: 1, nombre: "Jose Hernandez", isMensaje: false,email:"jose@hot.com",telefono:"238545164",mensajes:[] }, 
-        { id: 2, nombre: "Diana Pacheco", isMensaje: true,email:"may@hot.com",telefono:"238545164",mensajes:[] }]}
+    {id:7,nombre:"jesus a",username:"yisus37",rolClave:"adm",chats:[]}
 ]

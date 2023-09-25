@@ -5,6 +5,7 @@ export interface IChatItem {
     telefono: string,
     isMensaje: Boolean,
     mensajes:IMensajes[],
+    idEmisor:number,
 }
 export interface IMensajes{
     id:number,

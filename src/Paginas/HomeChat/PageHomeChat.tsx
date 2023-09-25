@@ -19,7 +19,7 @@ export default function PageHomeChat() {
         homeManager.getChats(7).subscribe(r=>{
             setChatsItem(r)
         })
-       return ()=>console.log("hola")
+       return ()=>console.log("desubscribirse")
     }, []);
     const avisoEliminarChat=(item:IChatItem)=>{
         chatSelectId.current=item
@@ -33,11 +33,10 @@ export default function PageHomeChat() {
     }
     const setMensajes=(msjs:IMensajes[])=>{
         if(chat===undefined)return
-        if(chat.mensajes.length>0)return
         const lista=[...chatsItem]
         const chatSelect=lista.find(c=>c.id===chat?.id);
         if(chatSelect===undefined)return
-        chatSelect.mensajes=msjs
+        chatSelect.mensajes=[...msjs,...chatSelect.mensajes]
         const index = lista.findIndex((a) => a.id === chat.id);
         lista[index]=chatSelect
         setChat(chatSelect)
@@ -90,7 +89,7 @@ export default function PageHomeChat() {
             </Grid>
 
             <Grid item xs={8} height={"100%"} width={"100%"}>
-                {chat?<MensajesChat setMensajes={setMensajes} eliminarChat={()=>avisoEliminarChat(chat)} chatitem={chat}/>:
+                {chat?<MensajesChat  eliminarChat={()=>avisoEliminarChat(chat)} chatitem={chat} setMensajes={setMensajes}/>:
                  <Box sx={{...flexColumn,}}>
 
                     <Box textAlign={"center"}>
@@ -109,30 +108,35 @@ export default function PageHomeChat() {
 }
 
 const MensajesChat=({chatitem,eliminarChat,setMensajes}:{chatitem:IChatItem,eliminarChat:()=>void,setMensajes:(msjs:IMensajes[])=>void})=>{
+    const gridRef = useRef<any>(null);
+    const [mensaje, setMensaje] = useState("")
     const [loading, setloading] = useState(false)
-
     useEffect(() => {
-        getMensajes()
+        if(gridRef.current){
+            gridRef.current.scrollTop = gridRef.current.scrollHeight;
+            const scroll= homeManager.scrollChat(gridRef.current,7,chatitem.idEmisor).subscribe(setMensajes)
+            return ()=>scroll.unsubscribe();
+        }
+
     }, [])
-    const getMensajes=()=>{
-       
-            setTimeout(() => {
-                const items=mensajes.filter(e=>e.idReceptor===7)
-                setMensajes(items)
-            }, 1000);
-        
+    const sendMensage=()=>{
+        if(!!!mensaje)return
+        const newMsg:IMensajes={id:new Date().valueOf(),mensaje,fecha:new Date().toDateString(),idEmisor:chatitem.idEmisor,idReceptor:7,isMio:true}
+        setMensajes([newMsg])
+        setMensaje("")
+        gridRef.current.scrollTop = gridRef.current.scrollHeight;
     }
-    
     return(
         
         <Grid container spacing={1} height={"100%"} width={"100%"}>
-        <Grid item xs={8} style={{position:"relative"}} >
-                <Box sx={{ position: "absolute", display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
-                    <CircularProgress />
-                </Box>
-            <Grid container spacing={1} height={"100%"} width={"100%"}>
-                <Grid item xs={12}  sx={{...flexColumn,height:"90%",padding:2}}>
-                    <Stack direction="column"  flexWrap="wrap" sx={{width:"98%",height:"95%",flexDirection:"column-reverse"}}>
+        <Grid item xs={8} style={{}} >
+                
+            <Grid container spacing={1}  width={"100%"} >
+                <Grid item xs={12}  sx={{...flexColumn,padding:2,maxHeight:"85vh",overflowY:"scroll",marginTop:3}} ref={gridRef} >
+                    <Stack direction="column"  flexWrap="wrap" sx={{width:"98%",flexDirection:"column-reverse",paddingTop:"50%",position:"relative"}}>
+                        <Box sx={{  display: "none", justifyContent: "center", alignItems: "center", width: "100%",bottom:5,position:"absolute",top:0,lefth:0 }} id="loadingChat">
+                            <CircularProgress />
+                            </Box>
                         {
                             chatitem.mensajes.length!==0?
                             chatitem.mensajes.map(m=>m.isMio?<ItemMensajeset>{m.mensaje}</ItemMensajeset>:<ItemMensajeget>{m.mensaje}</ItemMensajeget>)
@@ -152,12 +156,24 @@ const MensajesChat=({chatitem,eliminarChat,setMensajes}:{chatitem:IChatItem,elim
                 </Grid>
                 <Grid item xs={12} height={"10%"}>
 
-                    <FormControl variant="standard" sx={{width:"100%"}}>
+                    <FormControl variant="standard" sx={{width:"100%"}}  required >
                         <Input
+                            onChange={(e)=>setMensaje(e.target.value)}
+                            value={mensaje}
+                            onKeyDown={e=>{
+                                if(e.code==="Enter")sendMensage()
+                            }}
                             id="input-with-icon-adornment"
                             startAdornment={
                                 <InputAdornment position="start">
                                     <Icon>chat</Icon>
+                                </InputAdornment>
+                            }
+                            endAdornment={
+                                <InputAdornment position="end" >
+                                    <Button onClick={sendMensage}>
+                                        <Icon>chat</Icon>
+                                    </Button>
                                 </InputAdornment>
                             }
                         />
